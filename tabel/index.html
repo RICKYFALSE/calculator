@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Trigonometri dengan Grafik</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background-color: #f9f9f9;
+    }
+    input, select, button {
+      padding: 10px;
+      margin: 10px;
+      width: 80%;
+      max-width: 200px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .result {
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    #trigChart {
+      margin-top: 40px;
+      max-width: 600px;
+      height: 400px;
+    }
+  </style>
+  <!-- Tambahkan pustaka Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Kalkulator Trigonometri dengan Grafik</h2>
+    <label for="angle">Masukkan Sudut:</label>
+    <input type="number" id="angle" placeholder="Masukkan sudut">
+
+    <label for="unit">Pilih Satuan:</label>
+    <select id="unit">
+      <option value="degree">Derajat (°)</option>
+      <option value="radian">Radian</option>
+    </select>
+
+    <button onclick="calculate()">Hitung & Tampilkan Grafik</button>
+
+    <div class="result" id="result"></div>
+    <canvas id="trigChart"></canvas>
+  </div>
+
+  <script>
+    // Inisialisasi grafik
+    const ctx = document.getElementById('trigChart').getContext('2d');
+    let trigChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Sin',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            fill: false,
+            data: []
+          },
+          {
+            label: 'Cos',
+            borderColor: 'rgba(153, 102, 255, 1)',
+            fill: false,
+            data: []
+          },
+          {
+            label: 'Tan',
+            borderColor: 'rgba(255, 159, 64, 1)',
+            fill: false,
+            data: []
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            title: { display: true, text: 'Sudut (°)' }
+          },
+          y: {
+            title: { display: true, text: 'Nilai' },
+            suggestedMin: -1,
+            suggestedMax: 1
+          }
+        }
+      }
+    });
+
+    function calculate() {
+      const angleInput = parseFloat(document.getElementById("angle").value);
+      const unit = document.getElementById("unit").value;
+
+      if (isNaN(angleInput)) {
+        document.getElementById("result").innerHTML = "Masukkan sudut yang valid.";
+        return;
+      }
+
+      // Konversi sudut ke radian jika dalam derajat
+      const radians = unit === "degree" ? angleInput * (Math.PI / 180) : angleInput;
+
+      const sinValue = Math.sin(radians).toFixed(2);
+      const cosValue = Math.cos(radians).toFixed(2);
+      const tanValue = (angleInput % 180 === 90 && unit === "degree") ? "Tidak terdefinisi" : Math.tan(radians).toFixed(2);
+      const cscValue = sinValue != 0 ? (1 / sinValue).toFixed(2) : "Tidak terdefinisi";
+      const secValue = cosValue != 0 ? (1 / cosValue).toFixed(2) : "Tidak terdefinisi";
+      const cotValue = tanValue != 0 && tanValue !== "Tidak terdefinisi" ? (1 / tanValue).toFixed(2) : "Tidak terdefinisi";
+
+      // Tampilkan hasil
+      document.getElementById("result").innerHTML = `
+        <p>sin: ${sinValue}</p>
+        <p>cos: ${cosValue}</p>
+        <p>tan: ${tanValue}</p>
+        <p>cosec: ${cscValue}</p>
+        <p>sec: ${secValue}</p>
+        <p>cot: ${cotValue}</p>
+      `;
+
+      // Perbarui data grafik
+      updateChart(angleInput);
+    }
+
+    function updateChart(angle) {
+      const angles = [];
+      const sinValues = [];
+      const cosValues = [];
+      const tanValues = [];
+
+      for (let i = 0; i <= angle; i += 10) {
+        const rad = i * (Math.PI / 180); // Konversi ke radian
+
+        angles.push(i);
+        sinValues.push(Math.sin(rad).toFixed(2));
+        cosValues.push(Math.cos(rad).toFixed(2));
+        tanValues.push(i % 180 === 90 ? null : Math.tan(rad).toFixed(2)); // Tan tidak terdefinisi di 90°
+      }
+
+      // Perbarui data pada chart
+      trigChart.data.labels = angles;
+      trigChart.data.datasets[0].data = sinValues;
+      trigChart.data.datasets[1].data = cosValues;
+      trigChart.data.datasets[2].data = tanValues;
+      trigChart.update();
+    }
+  </script>
+
+</body>
+</html>

@@ -5,45 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kalkulator Trigonometri dengan Grafik</title>
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500&display=swap");
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Quicksand", sans-serif;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #091921;
     }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(#e91e63, #ffc107);
+      clip-path: circle(22% at 30% 20%);
+    }
+    body::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(#ffffff, #da00ff);
+      clip-path: circle(20% at 70% 90%);
+    }
+    body .container {
+      position: relative;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      overflow: hidden;
+      z-index: 10;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.2);
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      background-color: #f9f9f9;
     }
-    input, select, button {
+    body .container h2 {
+      color: #ffffff;
+      text-align: center;
+    }
+    body .container label {
+      font-weight: 500;
+      display: block;
+      margin: 15px 0 5px;
+      color: #ffffff;
+    }
+    body .container input, body .container select, body .container button {
+      width: 100%;
       padding: 10px;
-      margin: 10px;
-      width: 80%;
-      max-width: 200px;
-      border: 1px solid #ddd;
+      margin-bottom: 15px;
+      border: none;
       border-radius: 4px;
+      font-size: 16px;
+    }
+    body .container input {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+    body .container select {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+    body .container button {
+      background-color: #e91e63;
+      color: #ffffff;
+      cursor: pointer;
+    }
+    body .container button:hover {
+      background-color: #d81b60;
     }
     .result {
-      font-size: 16px;
+      color: #ffffff;
       margin-top: 20px;
     }
-    #trigChart {
-      margin-top: 40px;
-      max-width: 600px;
-      height: 400px;
+    canvas {
+      margin-top: 20px;
+      max-width: 100%;
+      height: auto;
     }
   </style>
-  <!-- Tambahkan pustaka Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
   <div class="container">
-    <h2>Kalkulator Trigonometri dengan Grafik</h2>
+    <h2>Kalkulator Trigonometri</h2>
     <label for="angle">Masukkan Sudut:</label>
-    <input type="number" id="angle" placeholder="Masukkan sudut">
+    <input type="number" id="angle" placeholder="">
 
     <label for="unit">Pilih Satuan:</label>
     <select id="unit">
@@ -58,7 +116,6 @@
   </div>
 
   <script>
-    // Inisialisasi grafik
     const ctx = document.getElementById('trigChart').getContext('2d');
     let trigChart = new Chart(ctx, {
       type: 'line',
@@ -89,12 +146,21 @@
         responsive: true,
         scales: {
           x: {
-            title: { display: true, text: 'Sudut (°)' }
+            title: { display: true, text: 'Sudut (°)', color: '#ffffff' },
+            ticks: { color: '#ffffff' }
           },
           y: {
-            title: { display: true, text: 'Nilai' },
+            title: { display: true, text: 'Nilai', color: '#ffffff' },
+            ticks: { color: '#ffffff' },
             suggestedMin: -1,
             suggestedMax: 1
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#ffffff'
+            }
           }
         }
       }
@@ -106,6 +172,11 @@
 
       if (isNaN(angleInput)) {
         document.getElementById("result").innerHTML = "Masukkan sudut yang valid.";
+        return;
+      }
+
+      if (unit === "degree" && (angleInput < 0 || angleInput > 360)) {
+        document.getElementById("result").innerHTML = "Sudut dalam derajat harus antara 0° dan 360°.";
         return;
       }
 
@@ -129,7 +200,7 @@
         <p>cot: ${cotValue}</p>
       `;
 
-      // Perbarui data grafik
+      // Perbarui data grafik hanya jika sudut valid
       updateChart(angleInput);
     }
 
@@ -156,6 +227,5 @@
       trigChart.update();
     }
   </script>
-
 </body>
 </html>
